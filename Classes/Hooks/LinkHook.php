@@ -31,14 +31,14 @@ class LinkHook
 
         if ($target === '_blank' || !$this->isInternalUrl($url)) {
             if (!isset($params['tagAttributes']['rel'])) {
-                $params['finalTagParts']['rel'] = $relAttribute;
+                $params['tagAttributes']['rel'] = $relAttribute;
                 $params['finalTag'] = str_replace('<a ', '<a rel="' . $relAttribute . '" ', $params['finalTag']);
             } else {
-                die('todo');
-                $finalTagParts['rel'] = implode(' ', array_unique(array_merge(
+                $params['tagAttributes']['rel'] = implode(' ', array_unique(array_merge(
                     GeneralUtility::trimExplode(' ', $relAttribute),
                     GeneralUtility::trimExplode(' ', $params['tagAttributes']['rel'])
                 )));
+                $params['finalTag'] = str_replace('rel="', 'rel="' . $relAttribute . ' ', $params['finalTag']);
             }
         }
     }
