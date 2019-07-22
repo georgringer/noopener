@@ -116,7 +116,6 @@ class LinkHook
                 }
             }
         }
-
         return $result;
     }
 
@@ -127,6 +126,8 @@ class LinkHook
      */
     protected function checkSysDomains($parsedUrl, $host): bool
     {
+        $result = false;
+
         // Removes the last path segment and slash sequences like /// (if given):
         $path = preg_replace('#/+[^/]*$#', '', $parsedUrl['path'] ?? '');
 
