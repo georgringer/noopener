@@ -6,10 +6,9 @@ This extension adds `rel="noopener noreferrer" to any links which are external l
 Installation
 ------------
 
-- Get the extension by either download it in the extension manager,
-from https://extensions.typo3.org/extension/noopener/ or by using composer `composer require georgringer/noopener`.
-- Install the extension.
-- Done
+1) Get the extension by using composer `composer require georgringer/noopener` 
+2) Install the extension.
+3) Done
 
 Requirements
 ------------
