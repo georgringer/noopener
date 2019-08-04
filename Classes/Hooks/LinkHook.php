@@ -100,7 +100,7 @@ class LinkHook
                 $host = $parsedUrl['host'];
 
                 if (version_compare(TYPO3_version, '9.0', '<')) {
-                    $result = $this->checkSysDomains($parsedUrl, $host);
+                    $result = $this->checkSysDomains($parsedUrl);
                 } else {
                     try {
                         $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
@@ -111,7 +111,7 @@ class LinkHook
                             }
                         }
                     } catch (SiteNotFoundException $e) {
-                        $result = $this->checkSysDomains($parsedUrl, $host);
+                        $result = $this->checkSysDomains($parsedUrl);
                     }
                 }
             }
@@ -121,14 +121,15 @@ class LinkHook
     }
 
     /**
-     * @param string $parsedUrl
+     * @param array $parsedUrl
      * @param string $host
      * @return bool
      */
-    protected function checkSysDomains($parsedUrl, $host): bool
+    protected function checkSysDomains($parsedUrl): bool
     {
+        $result = false;
         // Removes the last path segment and slash sequences like /// (if given):
-        $path = preg_replace('#/+[^/]*$#', '', $parsedUrl['path'] ?? '');
+        $path = preg_replace('#/+[^/]*$#', '', $parsedUrl['host'] ?? '');
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_domain');
         $queryBuilder->setRestrictions(GeneralUtility::makeInstance(FrontendRestrictionContainer::class));
@@ -141,7 +142,7 @@ class LinkHook
             foreach ($localDomains as $localDomain) {
                 // strip trailing slashes (if given)
                 $domainName = rtrim($localDomain['domainName'], '/');
-                if (GeneralUtility::isFirstPartOfStr($host . $path . '/', $domainName . '/')) {
+                if ($domainName === $path) {
                     $result = true;
                     break;
                 }
