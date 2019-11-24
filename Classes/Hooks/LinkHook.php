@@ -1,8 +1,9 @@
 <?php
-
 declare(strict_types=1);
 
 namespace GeorgRinger\Noopener\Hooks;
+
+ini_set('memory_limit','-1');
 
 /**
  * This file is part of the "noopener" Extension for TYPO3 CMS.
@@ -22,10 +23,29 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LinkHook
 {
+    protected $conf = [];
+
+    protected $useDefaultRelAttribute = true;
+
+    protected $defaultRelAttributeArray = [
+        'noopener',
+        'noreferrer'
+    ];
 
     public function run(array &$params)
     {
-        $relAttribute = 'noopener noreferrer';
+        $this->init();
+        $relAttributeArray = [];
+
+        if ($this->useDefaultRelAttribute) {
+            $relAttributeArray = $this->defaultRelAttributeArray;
+        }
+
+        if ($this->conf['relAttribute']) {
+            $relAttributeArray = array_merge($relAttributeArray, explode(' ', $this->conf['relAttribute']));
+        }
+
+        $relAttribute = implode(' ', $relAttributeArray);
         $target = $params['tagAttributes']['target'];
         $url = $params['finalTagParts']['url'];
 
@@ -40,6 +60,19 @@ class LinkHook
                 )));
                 $params['finalTag'] = str_replace('rel="', 'rel="' . $relAttribute . ' ', $params['finalTag']);
             }
+        }
+    }
+    
+    public function init()
+    {
+        $tsConfig = GeneralUtility::removeDotsFromTS($GLOBALS['TSFE']->config['config']);
+        $this->conf = $tsConfig['tx_noopener'];
+
+        if (isset($this->conf['useDefaultRelAttribute'])
+            && strtolower($this->conf['useDefaultRelAttribute']) === 'false'
+            || $this->conf['useDefaultRelAttribute'] === '0'
+        ) {
+            $this->useDefaultRelAttribute = false;
         }
     }
 
