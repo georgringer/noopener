@@ -1,8 +1,9 @@
 <?php
-
 declare(strict_types=1);
 
 namespace GeorgRinger\Noopener\Hooks;
+
+ini_set('memory_limit','-1');
 
 /**
  * This file is part of the "noopener" Extension for TYPO3 CMS.
@@ -22,10 +23,101 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LinkHook
 {
+    
+    /**
+     * @var array
+     */
+    protected $conf = [];
+    
+    /**
+     * @var bool
+     */
+    protected $useDefaultRelAttribute = true;
+    
+    /**
+     * @var array
+     */
+    protected $defaultRelAttributeArray = [
+        'noopener',
+        'noreferrer'
+    ];
+    
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types
+     *
+     * @var array
+     */
+    protected $relTypes = [
+        'alternate',
+        'archives',
+        'author',
+        'bookmark',
+        // 'canonical', // only allowed in "link"-element
+        // 'dns-prefetch', // only allowed in "link"-element
+        'external',
+        'first',
+        'help',
+        // 'icon', // only allowed in "link"-element
+        // 'import', // only allowed in "link"-element
+        'index',
+        'last',
+        'license',
+        // 'manifest', // only allowed in "link"-element
+        // 'modulepreload', // only allowed in "link"-element
+        'next',
+        'nofollow',
+        'noopener',
+        'noreferrer',
+        'opener',
+        // 'pingback', // only allowed in "link"-element
+        // 'preconnect', // only allowed in "link"-element
+        'prefetch', // Unimplemented in Firefox
+        // 'preload', // only allowed in "link"-element
+        // 'prerender', // only allowed in "link"-element
+        'prev',
+        'search',
+        // 'shortlink', // only allowed in "link"-element
+        'sidebar', // Obsolete since Firefox Gecko 63
+        // 'stylesheet', // only allowed in "link"-element
+        'tag',
+        'up',
+    ];
 
     public function run(array &$params)
     {
-        $relAttribute = 'noopener noreferrer';
+        $this->init();
+        $relAttributeArray = [];
+
+        if ($this->useDefaultRelAttribute) {
+            $relAttributeArray = $this->defaultRelAttributeArray;
+        }
+
+        if ($this->conf['relAttribute']) {
+            $relAttributeArray = array_merge($relAttributeArray, explode(' ', $this->conf['relAttribute']));
+        }
+
+        if ($this->conf['useCssClass'] && isset($params['tagAttributes']['class'])) {
+            if (strpos($params['tagAttributes']['class'], 'rel-') !== false) {
+                $classes = explode(' ', $params['tagAttributes']['class']);
+                $relClasses = [];
+                $altClasses = [];
+                foreach ($classes as $class) {
+                    $tmpClass = substr($class, 4);
+                    if (strpos($class, 'rel-') !== false && in_array($tmpClass, $this->relTypes)) {
+                        $relClasses[] = $tmpClass;
+                    } else {
+                        $altClasses[] = $class;
+                    }
+                }
+                $relAttributeArray = array_merge($relAttributeArray, $relClasses);
+                if ($this->conf['keepCssRelClass'] === 'false' || $this->conf['keepCssRelClass'] === '0') {
+                    $params['tagAttributes']['class'] = implode(' ', $altClasses);
+                    $params['finalTag'] = preg_replace('/class="([^\"]*)"/', 'class="' . $params['tagAttributes']['class'] . '"', $params['finalTag']);
+                }
+            }
+        }
+
+        $relAttribute = implode(' ', $relAttributeArray);
         $target = $params['tagAttributes']['target'];
         $url = $params['finalTagParts']['url'];
 
@@ -40,6 +132,22 @@ class LinkHook
                 )));
                 $params['finalTag'] = str_replace('rel="', 'rel="' . $relAttribute . ' ', $params['finalTag']);
             }
+        }
+    }
+    
+    /**
+     * initialize some basic variables from TypoScript configuration
+     */
+    public function init()
+    {
+        $tsConfig = GeneralUtility::removeDotsFromTS($GLOBALS['TSFE']->config['config']);
+        $this->conf = $tsConfig['tx_noopener'];
+
+        if (isset($this->conf['useDefaultRelAttribute'])
+            && strtolower($this->conf['useDefaultRelAttribute']) === 'false'
+            || $this->conf['useDefaultRelAttribute'] === '0'
+        ) {
+            $this->useDefaultRelAttribute = false;
         }
     }
 
