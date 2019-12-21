@@ -73,7 +73,7 @@ All mentioned expressions on that page can be used, everything else will be
 ignored and stay in the definition for the class-attribute.  
 As ``rel`` is often used for image-galleries this filter might look disadvantageous,
 but keep in mind that the extension is only handling external links and images
-are usuually served locally.  
+are usually served locally.  
 
 Also keep in mind that the settings can be various on different pages, as
 the settings are defined by ``TypoScript``, so with a bit nifty code settings
