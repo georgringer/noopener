@@ -1,8 +1,8 @@
 TYPO3 Extension `noopener`
 ==========================
 
-This extension adds `rel="noopener noreferrer"` to any links which are external
-links or defined with target '_blank'. This improves the security of the site:
+This extension adds ``rel="noopener noreferrer"`` to any links which are external
+links or defined with target ``'_blank'``. This improves the security of the site:
 
 - **noopener**: Instructs the browser to open the link without granting the new browsing context access to the document that opened it — by not setting the Window.opener property on the opened window (it returns null).
 - **noreferrer**: Prevents the browser, when navigating to another page, to send this page address, or any other value, as referrer via the `Referer:` HTTP header.
@@ -25,7 +25,7 @@ Nevertheless the extension can be used to manipulate the ``rel``-attribute furth
 Simple extended usage
 ---------------------
 To switch off that the default values ``noopener noreferrer`` are added to the
-``rel-``-attribute , use this TypoScript code:  
+``rel``-attribute , use this TypoScript code:  
 ::
     config.tx_noopener {
       useDefaultRelAttribute = false
@@ -44,12 +44,12 @@ Advanced extended usage
 If for some link one or several CSS-classes can be added, then CSS-classes
 with the prefix ``rel-`` can be configured being parsed and either copied or 
 shifted to the ``rel-``-attribute.  
-Assum a link with the following CSS-classes:
+Assum a link with definitoin for CSS-classes like this:
 ::
-    `rel-nofollow rel-something col-right kunterbunt`.
+    class="rel-nofollow rel-something col-right kunterbunt"
 
 In combination with the following setup the part ``rel-nofollow`` will be used
-by the extension to add the value `nofollow` to the ``rel-``-attribute:  
+by the extension to add the value ``nofollow`` to the ``rel``-attribute:  
 ::
     config.tx_noopener {
       useCssClass = 1
@@ -57,7 +57,7 @@ by the extension to add the value `nofollow` to the ``rel-``-attribute:
     }
 
 Due to the setting ``keepCssRelClass = 0`` will remove the corresponding part
-from the CSS-classes, so the final HTML will be clean and never shows the
+from the CSS-classes, so the final HTML will be clean and never show the
 logical relation between the attribute ``class`` and ``rel-`` which exists only
 in this extension.  
 So the notation of the ``rel`` and ``class``-attributes will look like that:  
@@ -67,15 +67,15 @@ So the notation of the ``rel`` and ``class``-attributes will look like that:
 The reason why the css-class ``rel-something`` was not moved to the
 ``rel-``-attribute is that the value `something` never has any standardized
 meaning and therefor is not included in the list of allowed values.  
-A list of allowed values can be seen here:  
-    https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types  
+A list of allowed values can be seen here: https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types  
 
 All mentioned expressions on that page can be used, everything else will be
 ignored and stay in the definition for the class-attribute.  
 As ``rel`` is often used for image-galleries this filter might look disadvantageous,
 but keep in mind that the extension is only handling external links and images
 are usuually served locally.  
-Also keep in mind that the settings can be various on diffenet pages, as
+
+Also keep in mind that the settings can be various on different pages, as
 the settings are defined by ``TypoScript``, so with a bit nifty code settings
 could be different even on the same page but in differen cols.
 
