@@ -84,5 +84,5 @@ Requirements
 
 - TYPO3 LTS 8.7 or 9.5
 
-*TYPO3 10.1 will add the basic setting ``rel="noopener noreferrer"`` for external
+*TYPO3 10.1 will add the basic setting* ``rel="noopener noreferrer"`` *for external
 links by default!*
