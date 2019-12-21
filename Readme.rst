@@ -26,19 +26,18 @@ Simple extended usage
 ---------------------
 To switch off that the default values `noopener noreferrer` are added to the
 `rel`-attribute , use this TypoScript code:  
-``  
-config.tx_noopener {
-  useDefaultRelAttribute = false
-}
-``
+::
+    config.tx_noopener {
+      useDefaultRelAttribute = false
+    }
+
 with the code `relAttribute = nofollow` another `rel`-value can be added,
 assumed the defaut values shall still be removed the code looks then like this:  
-``
-config.tx_noopener {
-  useDefaultRelAttribute = false
-  relAttribute = nofollow
-}
-``
+::
+    config.tx_noopener {
+      useDefaultRelAttribute = false
+      relAttribute = nofollow
+    }
 
 Advanced extended usage
 -----------------------
@@ -49,20 +48,20 @@ Assum a link with the following CSS-classes:
 `rel-nofollow rel-something col-right kunterbunt`.
 In combination with the following setup the part `rel-nofollow` will be used
 by the extension to add the value `nofollow` to the `rel`-attribute:  
-``
-config.tx_noopener {
-  useCssClass = 1
-  keepCssRelClass = 0
-}
-``
+::
+    config.tx_noopener {
+      useCssClass = 1
+      keepCssRelClass = 0
+    }
+
 Due to the setting `keepCssRelClass = 0` will remove the corresponding part
 from the CSS-classes, so the final HTML will be clean and never shows the
 logical relation between the attribute `class` and `rel` which exists only in
 this extension.  
 So the notation of the `rel` and `class`-attributes will look like that:  
-``
-rel="nofollow" class="rel-something col-right kunterbunt"
-``
+::
+    rel="nofollow" class="rel-something col-right kunterbunt"
+
 The reason why the css-class `rel-something` was not moved to the `rel`-attribute
 is that the value `something` never has any standardized meaning and therefor is
 not included in the list of allowed values. A list of allowed values can be seen
