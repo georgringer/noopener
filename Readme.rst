@@ -72,8 +72,8 @@ A list of allowed values can be seen here: https://developer.mozilla.org/en-US/d
 All mentioned expressions on that page can be used, everything else will be
 ignored and stay in the definition for the class-attribute.  
 As ``rel`` is often used for image-galleries this filter might look disadvantageous,
-but keep in mind that the extension is only handling external links and images
-are usually served locally.  
+but keep in mind that the extension is only handling external links (or those
+with target ``_blank``) and images are usually served locally.  
 
 Also keep in mind that the settings can be various on different pages, as
 the settings are defined by ``TypoScript``, so with a bit nifty code settings
@@ -84,5 +84,5 @@ Requirements
 
 - TYPO3 LTS 8.7 or 9.5
 
-*TYPO3 10.1 will add the basic setting `rel="noopener noreferrer"` for external
+*TYPO3 10.1 will add the basic setting ``rel="noopener noreferrer"`` for external
 links by default!*
