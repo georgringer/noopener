@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace GeorgRinger\Noopener\Hooks;
@@ -13,7 +12,6 @@ namespace GeorgRinger\Noopener\Hooks;
 
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\FrontendRestrictionContainer;
-use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -22,7 +20,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LinkHook
 {
-
+    /**
+     * @param array $params
+     */
     public function run(array &$params)
     {
         $relAttribute = 'noopener noreferrer';
@@ -43,6 +43,10 @@ class LinkHook
         }
     }
 
+    /**
+     * @param string $url
+     * @return bool
+     */
     protected function isInternalUrl(string $url): bool
     {
         return $this->isRelativeUrl($url) || $this->isInCurrentDomain($url) || $this->isInLocalDomain($url);
@@ -55,7 +59,7 @@ class LinkHook
      * @param string $url URL which needs to be checked
      * @return bool Whether the URL is considered to be relative
      */
-    protected function isRelativeUrl($url)
+    protected function isRelativeUrl($url): bool
     {
         $url = GeneralUtility::sanitizeLocalUrl($url);
         if (!empty($url)) {
@@ -68,7 +72,6 @@ class LinkHook
         return false;
     }
 
-
     /**
      * Determines whether the URL is on the current host and belongs to the
      * current TYPO3 installation. The scheme part is ignored in the comparison.
@@ -76,7 +79,7 @@ class LinkHook
      * @param string $url URL to be checked
      * @return bool Whether the URL belongs to the current TYPO3 installation
      */
-    protected function isInCurrentDomain($url)
+    protected function isInCurrentDomain($url): bool
     {
         $urlWithoutSchema = preg_replace('#^https?://#', '', $url);
         $siteUrlWithoutSchema = preg_replace('#^https?://#', '', GeneralUtility::getIndpEnv('TYPO3_SITE_URL'));
@@ -91,43 +94,34 @@ class LinkHook
      * @param string $url Absolute URL which needs to be checked
      * @return bool Whether the URL is considered to be local
      */
-    protected function isInLocalDomain($url)
+    protected function isInLocalDomain($url): bool
     {
-        $result = false;
         if (GeneralUtility::isValidUrl($url)) {
             $parsedUrl = parse_url($url);
             if ($parsedUrl['scheme'] === 'http' || $parsedUrl['scheme'] === 'https') {
                 $host = $parsedUrl['host'];
 
                 if (version_compare(TYPO3_version, '9.0', '<')) {
-                    $result = $this->checkSysDomains($parsedUrl);
-                } else {
-                    try {
-                        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
-                        $sites = $siteFinder->getAllSites();
-                        foreach ($sites as $site) {
-                            if ($site->getBase()->getHost() === $host) {
-                                return true;
-                            }
-                        }
-                    } catch (SiteNotFoundException $e) {
-                        $result = $this->checkSysDomains($parsedUrl);
+                    return $this->isSysDomain($parsedUrl);
+                }
+
+                $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+                foreach ($siteFinder->getAllSites() as $site) {
+                    if ($site->getBase()->getHost() === $host) {
+                        return true;
                     }
                 }
             }
         }
-
-        return $result;
+        return false;
     }
 
     /**
      * @param array $parsedUrl
-     * @param string $host
      * @return bool
      */
-    protected function checkSysDomains($parsedUrl): bool
+    protected function isSysDomain($parsedUrl): bool
     {
-        $result = false;
         // Removes the last path segment and slash sequences like /// (if given):
         $path = preg_replace('#/+[^/]*$#', '', $parsedUrl['host'] ?? '');
 
@@ -143,11 +137,10 @@ class LinkHook
                 // strip trailing slashes (if given)
                 $domainName = rtrim($localDomain['domainName'], '/');
                 if ($domainName === $path) {
-                    $result = true;
-                    break;
+                    return true;
                 }
             }
         }
-        return $result;
+        return false;
     }
 }
