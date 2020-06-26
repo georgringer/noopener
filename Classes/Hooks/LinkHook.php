@@ -38,7 +38,7 @@ class LinkHook
                     GeneralUtility::trimExplode(' ', $relAttribute),
                     GeneralUtility::trimExplode(' ', $params['tagAttributes']['rel'])
                 )));
-                $params['finalTag'] = str_replace('rel="', 'rel="' . $relAttribute . ' ', $params['finalTag']);
+                $params['finalTag'] = preg_replace('/rel=\"(.*?)\"/', 'rel="' . $params['tagAttributes']['rel'] . '"', $params['finalTag']);
             }
         }
     }
